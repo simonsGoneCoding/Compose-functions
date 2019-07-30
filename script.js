@@ -1,5 +1,3 @@
-//amazon shoping 
-
 const user = {
   name: 'Marika',
   active: true,
@@ -7,31 +5,47 @@ const user = {
   purchases: []
 }
 
-// purchaseItem(  // using compose we're going right to left
-//   emptyCart
-//   buyItem
-//   applyTaxToItems
-//   itmesToCart
-// )
+const compose = (f, g) => (...args) => f(g(...args)) // compose function 
 
-const compose = (f, g) => (...args) => f(g(...args))
-
-const purchaseItem = (...fns) => fns.reduce(compose)
+const purchaseItem = (...fns) => fns.reduce(compose) // functions as arguments 
 
 function itmesToCart(user, item) {
   const updatedCart = user.cart.concat(item)
-  return Object.assign({}, )
+  return Object.assign({}, user, {
+    cart: updatedCart
+  })
 }
 
-function applyTaxToItems() {}
+function applyTaxToItems(user) {
+  const cart = user.cart
+  const taxRate = 1.21
+  const updatedCart = cart.map((item) => {
+    return {
+      name: item.name,
+      price: item.price * taxRate
+    }
+  })
+  return Object.assign({}, user, {
+    cart: updatedCart
+  })
+}
 
-function buyItem() {}
+function buyItem(user) {
+  return Object.assign({}, user, {
+    purchases: user.cart
+  })
+}
 
-function emptyCart() {}
+function emptyCart(user) {
+  return Object.assign({}, user, {
+    cart: []
+  })
+}
 
+// using compose we're going right to left
+const endShopping = purchaseItem(emptyCart, buyItem, applyTaxToItems, itmesToCart)
 
-//implement a cart feature 
-// 1. Add items to cart.
-// 2. Add 8% tax to item in cart
-// 3. buy item \: cart --> purchases
-// 4. Empty cart  
+console.log(endShopping(user, {
+  name: 'laptop',
+  price: 599
+}))
